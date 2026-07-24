@@ -1,0 +1,8 @@
+{
+  "label": "Lab 1 - Get Ready",
+  "position": 1,
+  "link": {
+    "type": "generated-index",
+    "description": "Set up your environment and establish a baseline for what the stock Assistant looks like before you apply any power-user techniques."
+  }
+}
