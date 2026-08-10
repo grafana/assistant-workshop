@@ -1,8 +1,8 @@
 {
-  "label": "Lab 1 - Get Ready",
+  "label": "Lab 1 - Understanding Assistant",
   "position": 1,
   "link": {
     "type": "generated-index",
-    "description": "Set up your environment and establish a baseline for what the stock Assistant looks like before you apply any power-user techniques."
+    "description": "The everyday foundation: ask questions in natural language, navigate Grafana by asking, find and understand dashboards, and read telemetry across metrics, logs, and traces."
   }
 }
