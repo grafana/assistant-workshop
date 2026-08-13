@@ -1,2 +1,3 @@
-# assistant-workshop
-Source code and labs for the Grafana Assistant workshop
+# Assistant Workshop
+
+This repository contains the source code and exercises for the Grafana Labs Introduction to Grafana Assistant workshop.
