@@ -27,13 +27,11 @@ Your logon has been sent to the email address you provided when you signed up. I
 
 ## What's covered
 
-In this workshop, we'll cover the everyday workflows that make the Grafana Assistant useful day to day:
+This workshop builds from everyday fundamentals to a full, agent-assisted incident investigation:
 
-- Asking questions in natural language and getting oriented in your stack
-- Navigating Grafana by asking instead of clicking
-- Finding dashboards by concept and understanding what their panels show
-- Reading and correlating your telemetry across metrics, logs, and traces
+- **Lab 1 - Understanding Assistant:** the everyday workflows - asking questions in natural language, navigating Grafana by asking, finding dashboards by concept, and reading and correlating telemetry across metrics, logs, and traces.
+- **Lab 2 - Anatomy of an Incident:** follow a single storefront outage from alert to resolution, using the Assistant's power features together. There features include infrastructure Memories, structured prompting, a Deep Investigation, MCP-driven remediation, and reusable Rules and Skills.
 
-- Hands-on steps for you to perform in Grafana Cloud
+Every step is hands-on for you to perform in Grafana Cloud.
 
 Once you're ready to begin, click the Next button below to move to the first lab.

@@ -20,7 +20,7 @@ This is the everyday foundation for everything else in the workshop. Before you 
 - Read each telemetry signal, and correlate across them for a full picture
 
 :::note
-Before you start, make sure you're logged into your Grafana Cloud stack, the Assistant panel opens from the sparkles icon (top-right of the navigation bar), and you can reach the AppEnv e-commerce storefront. This lab uses the `frontend`, `productcatalogservice`, and friends in the `ecommerce-prod` namespace, and is about normal, day-to-day exploration.
+Before you start, make sure you're logged into your Grafana Cloud stack, the Assistant panel opens from the sparkles icon (top-right of the navigation bar), and you can reach the AppEnv e-commerce frontend. This lab uses the `frontend`, `productcatalogservice`, and friends in the `ecommerce-prod` namespace, and is about normal, day-to-day exploration.
 :::
 
 ## Part 1 - Ask questions and get oriented
@@ -72,8 +72,10 @@ The Assistant uses the connected Prometheus, Loki, and Tempo data sources in you
 The Assistant remembers the conversation. Without restating anything, send:
 
 ```text
-Of those, which one would you look at first if a customer reported the storefront was slow?
+Of those, which one would you look at first if a customer reported the frontend was slow?
 ```
+
+![frontend](/img/5-slow-frontend.png)
 
 The Assistant uses the prior context to reason about your specific services. This back-and-forth - asking, then narrowing - is the core everyday rhythm.
 
@@ -89,9 +91,13 @@ In a new conversation, try:
 Take me to the list of dashboards.
 ```
 
+![dashboards](/img/6-dashboards.png)
+
 ```text
 Open Explore so I can query metrics.
 ```
+
+![explore](/img/7-explore.png)
 
 The Assistant responds with a link (or navigates you) to the right part of Grafana. This is a small thing that saves dozens of clicks a day.
 
@@ -102,6 +108,7 @@ When you don't know where a feature is, ask instead of searching the docs:
 ```text
 Where do I configure alert rules in this Grafana instance?
 ```
+![alert rules](/img/8-alert-rules.png)
 
 ```text
 How do I create a new dashboard folder?
@@ -120,14 +127,17 @@ Most teams have more dashboards than anyone can remember. The Assistant finds th
 In a new conversation, send:
 
 ```text
-What dashboards do we have related to the storefront or the productcatalogservice?
+What dashboards do we have related to the frontend or the productcatalogservice?
 ```
+![find dashboards](/img/9-find-dashboards.png)
 
 Then try a broader concept:
 
 ```text
 Find dashboards that show database or postgres health.
 ```
+
+![find dashboards](/img/10-find-dashboards-2.png)
 
 The Assistant uses semantic search, so a dashboard called "Catalog Service Overview" can match a query about "product listings" even without the exact words.
 
@@ -136,22 +146,27 @@ The Assistant uses semantic search, so a dashboard called "Catalog Service Overv
 Pick one of the dashboards the Assistant returned and ask it to explain the contents:
 
 ```text
-Explain what the panels on the productcatalogservice dashboard show, and what "good" looks like for each one.
+Explain what the panels on the frontend success rate dashboard show, and what "good" looks like for each one.
 ```
 
-This turns an unfamiliar wall of charts into something you can actually read.
+![](/img/11-explain.png)
 
+This turns an unfamiliar wall of charts into something you can actually read.
+13-slo
 ### Step 3.3 - Ask about a specific panel
 
 Drill into a single visualization:
 
 ```text
-On that dashboard, which data source powers the latency panel, and what query is it running?
+On this dashboard, which data source powers the Error Budget Burndown panel, and what query is it running?
 ```
+![](/img/12-data-source.png)
 
 ```text
-What is the current value in the request rate panel, and is that normal?
+What is the current value in the SLO panel, and is that normal?
 ```
+
+![](/img/13-slo.png)
 
 The Assistant can read both the panel's **configuration** (its query and data source) and the **data** it's currently returning.
 
@@ -171,11 +186,15 @@ Metrics tell you *what* is happening and *how much*. Start a new conversation an
 Show me the request rate, error rate, and P95 latency for the productcatalogservice over the last hour.
 ```
 
+![](/img/14-rate.png)
+
 Read the charts. Ask the Assistant to interpret them for you:
 
 ```text
 Is any of that outside the normal range? What would you keep an eye on?
 ```
+
+![](/img/15-normal.png)
 
 This is the RED method (Rate, Errors, Duration) in practice - the everyday starting point for "how healthy is this service?"
 
@@ -187,10 +206,12 @@ Logs tell you *why*. Send:
 Show me recent error logs for the productcatalogservice.
 ```
 
+![](/img/16-logs.png)
+
 Now use one of the Assistant's most useful everyday tricks - **summarize** a noisy log stream instead of reading it line by line:
 
 ```text
-Summarize those errors - group them by message and tell me which is most common.
+Summarize those errors. Group them by message and tell me which is most common.
 ```
 
 The Assistant condenses hundreds of log lines into a handful of patterns, so you can see the signal instead of scrolling.
@@ -206,7 +227,7 @@ Show me a slow or failed trace involving the frontend in the last hour.
 Then have the Assistant walk you through it:
 
 ```text
-Explain what this trace shows - which service was slow, and where the time went.
+Explain what this trace shows. Which service was slow and where was the the time spent?
 ```
 
 Traces are the signal people find most intimidating; having the Assistant narrate the span breakdown makes them approachable.
@@ -216,7 +237,7 @@ Traces are the signal people find most intimidating; having the Assistant narrat
 The real power is connecting the three. In the **same conversation**, tie them together:
 
 ```text
-Bring it together: for the productcatalogservice over the last hour, do the error rate spikes in the metrics line up with the errors in the logs and the failures in the traces?
+For the productcatalogservice over the last hour, do the error rate spikes in the metrics line up with the errors in the logs and the failures in the traces?
 ```
 
 Correlating metrics → logs → traces is exactly what a manual investigation does by hand. Doing it conversationally is the everyday skill that makes the advanced labs (Investigations especially) click.
@@ -232,7 +253,7 @@ Finish with a single everyday prompt that exercises everything above: questions,
 Start a new conversation and send:
 
 ```text
-Give me a quick health overview of the storefront right now. Cover the frontend and the productcatalogservice. Use metrics, logs, and traces, point me at the most relevant dashboard, and flag anything that looks off.
+Give me a quick health overview of the frontend right now. Cover the frontend and the productcatalogservice. Use metrics, logs, and traces, point me at the most relevant dashboard, and flag anything that looks off.
 ```
 
 Read the response critically:
