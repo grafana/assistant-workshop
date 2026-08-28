@@ -5,11 +5,11 @@ sidebar_position: 1
 # Lab 1 - Understanding the Basics of Grafana Assistant
 
 
-This is the everyday foundation for everything else in the workshop. Before you reach for Investigations, Skills, or MCP, you should be fluent in the three things you'll do with the Assistant every single day:
+This is the foundation for everything else in the workshop. Before you reach for Investigations, Skills, or MCP, you should be fluent in the three things you'll do with the Assistant every day:
 
-1. **Ask questions**: prompt the assistant in natural language and understand what the Assistant can see
-2. **Find dashboards**: navigate and find dashbaords by concept and have the Assistant explain them
-3. **Understand your telemetry**: read and correlate metrics, logs, and traces to understand your telemetry
+1. **Ask questions**: prompt the Assistant in natural language and understand what it can see
+2. **Find dashboards**: locate them by concept and have the Assistant explain what they show
+3. **Understand your telemetry**: read metrics, logs, and traces, and correlate across them
 
 ## Learning objectives
 
@@ -77,7 +77,7 @@ Of those, which one would you look at first if a customer reported the frontend 
 
 ![frontend](/img/5-slow-frontend.png)
 
-The Assistant uses the prior context to reason about your specific services. This back-and-forth - asking, then narrowing - is the core everyday rhythm.
+The Assistant uses the prior context to reason about your specific services.
 
 ## Part 2 - Navigate Grafana by asking
 
@@ -108,6 +108,7 @@ When you don't know where a feature is, ask instead of searching the docs:
 ```text
 Where do I configure alert rules in this Grafana instance?
 ```
+
 ![alert rules](/img/8-alert-rules.png)
 
 ```text
@@ -129,6 +130,7 @@ In a new conversation, send:
 ```text
 What dashboards do we have related to the frontend or the productcatalogservice?
 ```
+
 ![find dashboards](/img/9-find-dashboards.png)
 
 Then try a broader concept:
@@ -152,7 +154,7 @@ Explain what the panels on the frontend success rate dashboard show, and what "g
 ![](/img/11-explain.png)
 
 This turns an unfamiliar wall of charts into something you can actually read.
-13-slo
+
 ### Step 3.3 - Ask about a specific panel
 
 Drill into a single visualization:
@@ -160,6 +162,7 @@ Drill into a single visualization:
 ```text
 On this dashboard, which data source powers the Error Budget Burndown panel, and what query is it running?
 ```
+
 ![](/img/12-data-source.png)
 
 ```text
@@ -171,12 +174,12 @@ What is the current value in the SLO panel, and is that normal?
 The Assistant can read both the panel's **configuration** (its query and data source) and the **data** it's currently returning.
 
 :::info
-For deeper dashboard work - creating new dashboards, editing panels, changing visualizations - there's a dedicated **Dashboarding** mode. This lab stays in default mode and focuses on *finding and understanding* existing dashboards, which is the everyday case.
+For deeper dashboard work like creating new boards, editing panels, or changing visualizations, there's a dedicated **Dashboarding** mode. This lab stays in default mode and focuses on *finding and understanding* dashboards that already exist, which is the more common job.
 :::
 
 ## Part 4 - Understand your telemetry
 
-This is the heart of everyday observability: reading the three signals and connecting them. You'll look at metrics, then logs, then traces - each with the Assistant's help - and finish by correlating them.
+Reading the three signals and connecting them is one of the main roles of Assistant. You'll look at metrics, then logs, then traces, each with the Assistant's help, and finish by correlating them.
 
 ### Step 4.1 - Metrics: the shape of the system
 
@@ -196,7 +199,7 @@ Is any of that outside the normal range? What would you keep an eye on?
 
 ![](/img/15-normal.png)
 
-This is the RED method (Rate, Errors, Duration) in practice - the everyday starting point for "how healthy is this service?"
+That's the RED method (Rate, Errors, Duration) in practice, and it's where most people start with "how healthy is this service?"
 
 ### Step 4.2 - Logs: the detail behind the shape
 
@@ -208,7 +211,7 @@ Show me recent error logs for the productcatalogservice.
 
 ![](/img/16-logs.png)
 
-Now use one of the Assistant's most useful everyday tricks - **summarize** a noisy log stream instead of reading it line by line:
+Now for one of the most useful things you can ask it. Have it **summarize** a noisy log stream instead of reading the stream line by line:
 
 ```text
 Summarize those errors. Group them by message and tell me which is most common.
@@ -227,7 +230,7 @@ Show me a slow or failed trace involving the frontend in the last hour.
 Then have the Assistant walk you through it:
 
 ```text
-Explain what this trace shows. Which service was slow and where was the the time spent?
+Explain what this trace shows. Which service was slow, and where was the time spent?
 ```
 
 Traces are the signal people find most intimidating; having the Assistant narrate the span breakdown makes them approachable.
@@ -240,7 +243,7 @@ The real power is connecting the three. In the **same conversation**, tie them t
 For the productcatalogservice over the last hour, do the error rate spikes in the metrics line up with the errors in the logs and the failures in the traces?
 ```
 
-Correlating metrics → logs → traces is exactly what a manual investigation does by hand. Doing it conversationally is the everyday skill that makes the advanced labs (Investigations especially) click.
+Correlating metrics → logs → traces is exactly what a manual investigation does by hand. Doing it conversationally is what makes the later labs, and Investigations in particular, click.
 
 :::tip
 **Metrics → Logs → Traces is the everyday loop.** Metrics show you *that* something changed, logs tell you *why*, and traces show you *where*. Get comfortable moving between them by asking, and most day-to-day questions answer themselves.
@@ -248,7 +251,7 @@ Correlating metrics → logs → traces is exactly what a manual investigation d
 
 ## Part 5 - Put it all together
 
-Finish with a single everyday prompt that exercises everything above: questions, dashboards, and all three signals at once.
+Finish with one prompt that exercises questions, dashboards, and all three signals at once.
 
 Start a new conversation and send:
 
@@ -262,14 +265,14 @@ Read the response critically:
 - Did it point you at a **real dashboard** you could open?
 - Did it **flag** something specific, or stay generic?
 
-This is your everyday baseline. When you can get a useful health overview in one prompt and drill into any part of it with a follow-up, you've have the foundation of what the Assistant can do.
+That's your baseline. When you can get a useful health overview in one prompt and drill into any part of it with a follow-up, you have the foundation everything else in the workshop builds on.
 
 ## What just happened
 
-In this lab you practiced the three everyday workflows that underpin everything else:
+In this lab you practiced the three workflows that underpin everything else:
 
-- **Asking questions** - orienting in a stack, querying data, and following up in a conversation
-- **Finding dashboards** - locating them by concept and understanding their panels
-- **Understanding telemetry** - reading metrics, logs, and traces, and correlating across them
+- **Asking questions**: orienting in a stack, querying data, and following up in a conversation
+- **Finding dashboards**: locating them by concept and understanding their panels
+- **Understanding telemetry**: reading metrics, logs, and traces, and correlating across them
 
-Every advanced capability - Memories, Investigations, Skills, MCP - is a force multiplier on top of these fundamentals.
+Memories, Investigations, Skills, and MCP all build on these three. They're force multipliers on the fundamentals, not replacements for them.
