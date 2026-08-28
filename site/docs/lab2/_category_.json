@@ -1,0 +1,8 @@
+{
+  "label": "Lab 2 - Assistant During an Incident",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "description": "Follow a single storefront outage end to end and use the Assistant as an agent across the whole incident lifecycle: get oriented with Memories, triage by prompting, root-cause with a Deep Investigation, remediate and file a ticket with MCP, then encode the whole flow as a Rule and a Skill so next time is one command."
+  }
+}

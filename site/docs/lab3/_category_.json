@@ -1,0 +1,8 @@
+{
+  "label": "Lab 3 - Assistant Where Your Team Works",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "description": "Take the Assistant out of the browser and into the rest of your team's workflow: answering in a Slack incident channel, running headless from the command line and CI, doing recurring work on a schedule with Automations, and starting investigations the moment an alert fires. Finish by locating the blast radius in each of those surfaces."
+  }
+}
