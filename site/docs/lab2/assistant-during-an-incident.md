@@ -4,39 +4,51 @@ sidebar_position: 2
 
 # Lab 2 - Assistant During an Incident
 
-Follow a single storefront outage from the first alert through to a fix and a reusable playbook. By the time the incident is closed you'll have touched **everything the Assistant can do**: quickstart prompts, `@` mentions, query authoring across PromQL / LogQL / TraceQL / SQL, Memories, structured triage, a Deep Investigation, collaboration and sharing, MCP-driven remediation, Dashboarding mode, IRM automation, and reusable Rules and Skills.
+Follow a single storefront outage from the first alert through to a fix and a reusable playbook. By the time the incident is closed you'll have used most of what the Assistant offers an on-call engineer:
 
-It runs as one continuous storyline. It's a single on-call shift, start to finish, with no disconnected exercises. Watch the Assistant change roles as the incident unfolds. It begins as a **guide** that knows your stack, then works as a **query translator**, a **triage partner**, a **root-cause investigator**, an **agent that acts**, a **communicator** for your team, and finally a **teacher** that turns the whole shift into reusable automation.
+- Suggested prompts to open a shift, and where team-wide Quickstart prompts live
+- Infrastructure Memories, for orienting in a system you don't own
+- Panels and dashboards handed over as context, with the crosshair and `@` mentions
+- Queries written, explained, and refined for you, across PromQL, LogQL, TraceQL, and SQL
+- Triage that works across every signal your stack collects, profiles included
+- A Deep Investigation that works the problem in the background
+- Audience-specific summaries and a shareable evidence trail
+- Remediation through MCP, with a human approving every write
+- Dashboarding mode and Assistant Watchers, to catch the next occurrence
+- Rules, Skills, and IRM automation, so the next shift starts where this one finished
+
+It runs as one continuous storyline. It's a single on-call shift, start to finish, with no disconnected exercises. Watch the Assistant change roles as the incident unfolds: it begins as a guide that knows your stack, then works as a query translator, a triage partner, a root-cause investigator, an agent that acts, a communicator for your team, and finally a teacher that turns the whole shift into reusable automation.
 
 :::note
-**This builds on Lab 1 rather than repeating it.** You already know how to ask the Assistant what it can do, navigate Grafana by prompting, find dashboards by concept, and read metrics, logs, and traces one signal at a time. You'll use every one of those here, but at incident speed, on a system that's actively broken, and without stopping to explain them again. Where a step assumes something from Lab 1, it says so.
+This builds on Lab 1 rather than repeating it. You already know how to ask the Assistant what it can do, navigate Grafana by prompting, find dashboards by concept, and open with a broad question before pulling on whichever signal the answer points at. You'll use every one of those here, but at incident speed, on a system that's actively broken, and without stopping to explain them again. Where a step assumes something from Lab 1, it says so.
 :::
 
 ## Learning objectives
 
-- Start a shift with the Assistant's suggested prompts and orient in an unfamiliar stack with Memories
-- Point the Assistant at exactly the panel or dashboard you mean instead of describing it
-- Author, explain, and refine queries in PromQL, LogQL, and TraceQL without knowing the syntax
-- Run Lab 1's metrics, logs, and traces loop under pressure, as structured triage that produces a hypothesis
-- Find what changed by asking historical rather than current-state questions
-- Launch a Deep Investigation, follow its hypotheses to a root-cause report, and audit the sources behind it
-- Package findings for different audiences and share a conversation as a read-only link
-- Remediate with MCP safely and with human approval: restart failing pods, then file the fix
-- Read an MCP server's configuration and see how its credential and tool list decide what it can do
-- Build a monitoring dashboard in Dashboarding mode to catch the next occurrence
-- Capture the whole shift as a Rule and a Skill, wire up IRM automation, and give feedback
+By the end of this lab you'll be able to:
+
+- See how suggested prompts and Memories help you orient in an unfamiliar Grafana stack
+- Hand the Assistant a panel or a dashboard as context, rather than describing what you're looking at
+- Use the Assistant to write, explain, and refine queries so you can understand data in a language you don't speak
+- Triage a live problem by asking for insight, instead of picking a telemetry type and working through it
+- Find what changed, by asking historical questions rather than current-state ones
+- Use and understand Deep Investigations, including how to audit the evidence behind a verdict
+- Package one finding for the different audiences you have to update, and share it safely
+- Remediate through MCP with a human in the loop, and judge what an MCP server is allowed to do
+- Turn a shift into knowledge that lasts: a dashboard, a Watcher, a Rule, and a Skill
 
 :::note
-**Before you start.** This lab goes deeper than Lab 1 and needs a few extra capabilities on your stack, which your facilitator has already arranged:
+**When the incident is live.** The scenario arms and disarms itself on a repeating schedule, so there's nothing for you to set up or trigger. The storefront breaks, stays broken for about 45 minutes, recovers, and the window comes round again a couple of hours later. Whenever you start, the incident is either firing right now or finished recently.
 
-- **Assistant User**: for the whole lab
-- **Assistant Investigation User**: for the Deep Investigation in Part 6
-- **Assistant MCP User**: or higher, for the Kubernetes and Gitea actions in Part 8
-- **Assistant Admin**: to save an org-wide Rule in Part 10 (a personal-scope Rule works without it)
+If you arrive to a healthy storefront with those alerts resolved, you've simply landed between windows. Every querying, dashboard, and triage step in this lab behaves the same on historical data, so find the last window and work that instead:
 
-**When the incident is live.** There's nothing to set up, and you'll never be asked to flip a feature flag. The scenario arms and disarms itself on a repeating schedule. The storefront breaks, stays broken for about 45 minutes, recovers, and the window comes round again a couple of hours later. So whenever you start, the incident is either firing right now or finished recently.
+1. Ask the Assistant `When did the ProductCatalogServiceErrorRate alert last fire, and how long did it stay firing?` It reads the alert's history and gives you the window. Your facilitator can also tell you.
+2. Open the time picker in the top right of any dashboard or Explore page, choose **Absolute time range**, and enter a from and to that bracket that window with a few minutes either side. The Assistant reads the page's time range as context.
+3. Say the window in your prompts as well, for example "between 14:05 and 14:50 today". A range in the message leaves no doubt, wherever you happen to be in Grafana.
+:::
 
-If you arrive to a healthy storefront with those alerts resolved, you've simply landed between windows. Point the Grafana time picker at the most recent one and carry on, because every querying, dashboard, and triage step in this lab behaves the same on historical data. Your facilitator can tell you when the last window was, or you can spot it as the most recent spike on any of the alert panels.
+:::info
+**Gitea, and where it fits.** Part 8 files the permanent fix into Gitea, a self-hosted Git service running in your workshop environment with an `assistant-workshop` repository on it. It's standing in for whatever tracks work at your organization. The pattern is identical for a code host, an issue tracker, or a project management tool such as Jira, Linear, ServiceNow, or GitHub, because MCP is a standard interface rather than a per-product integration: connect the server, scope its tools and its credential, and the Assistant can file into the system your team already uses.
 :::
 
 :::info
@@ -71,29 +83,37 @@ It's the middle of your afternoon. Your phone buzzes. In Grafana, a cluster of a
 
 You have several alerts firing across the frontend, the product catalog, and postgres all at once, unhappy customers, and no idea yet how they connect. This is exactly the kind of multi-service, cross-signal problem the Assistant is built for. Time to work it.
 
-Open the storefront in another tab and confirm it for yourself. The failure is **intermittent**. Refresh a few times and more than half the loads come back with an empty product grid or an error, while the rest render products perfectly. Expect that share to grow the longer the scenario runs, because the service starts by failing a fraction of requests outright and fails more of them as the connection pool genuinely exhausts. Partial, flickering failure like this is easy to talk yourself out of by eye, which is why you need the telemetry. Then come back to the Assistant.
+Open the storefront in another tab and confirm it for yourself. The failure is intermittent. Refresh a few times and more than half the loads come back with an empty product grid or an error, while the rest render products perfectly. Expect that share to grow the longer the scenario runs, because the service starts by failing a fraction of requests outright and fails more of them as the connection pool genuinely exhausts. Partial, flickering failure like this is easy to talk yourself out of by eye, which is why you need the telemetry.
+
+### Step 2.1 - Ask the obvious question first
+
+Before you start forming theories, hand the whole thing over. Open one of the firing alerts in Grafana (from the notification, or through **Alerts & IRM → Alert rules**), open the Assistant beside it, and ask exactly what you'd ask a colleague who'd been staring at it for five minutes:
+
+```text
+What happened here? What is the productcatalogservice, what does it talk to, and what is this alert telling us about customer impact?
+```
+
+The Assistant reads the page you're on, so the alert's name, labels, query, and time window all arrive as context without you retyping any of them. One question gets you what the alert means, the service behind it, its dependencies, and a first read on impact. That's the ten minutes most people lose at the start of an incident, spent instead.
 
 ---
 
 ## Part 3 - Orient in seconds with Memories
 
-The worst moment in any incident is the first one: *what even is this system?* If you're on-call for a service you don't own, you can lose ten minutes just building a mental map. The Assistant skips that step, because it has already built the map for you with **Infrastructure Memories**.
+That answer was about your services rather than about product catalogs in general, and the reason is worth a minute of your time.
 
-Memories are an automatic knowledge base. The Assistant scans your connected Prometheus, Loki, and Tempo data sources and writes structured notes about each service -- what it does, its key metrics, its dependencies, and its log structure. That context is pre-loaded into every conversation, so you never start from zero.
+The worst moment in any incident is the first one: *what even is this system?* If you're on-call for a service you don't own, you can lose that ten minutes just building a mental map. The Assistant skips the step, because it has already built the map for you with **Infrastructure Memories**.
 
-:::warning
-**Seed the memories before you start.** On a freshly provisioned workshop stack the memory store is empty, and the *first* scan has to be triggered by hand even though later refreshes are automatic. Open **Settings → Infrastructure memory** (`/a/grafana-assistant-app/settings/memories`); if you see a "Discover Your Infrastructure" panel with a **Start Discovery Scan** button, click it and let it finish before running the next step. It takes roughly two minutes and reports progress as it goes. Skip this and the Assistant will answer the next prompt from general knowledge instead of from your environment, which makes the whole point of the step invisible.
-:::
+Memories are an automatic knowledge base. The Assistant scans your connected data sources and writes structured notes about each service: what it does, its key metrics, its dependencies, and its log structure. That context is pre-loaded into every conversation, so you never start from zero. Your workshop environment ran the first scan when it was built, so the notes are already waiting for you.
 
-### Step 3.1 - Ask what it already knows
+### Step 3.1 - Map the blast radius
 
-Start a **new conversation** and send:
+Stay in the same conversation and go one level deeper:
 
 ```text
-What do you know about the productcatalogservice in the ecommerce-prod namespace and its dependencies? Focus on the request path from the frontend down to the database.
+Walk me through the request path from the frontend down to the database for product listings, and tell me which other services would feel it if the productcatalogservice failed.
 ```
 
-Read the answer. Notice that it names **your** services (`frontend`, `productcatalogservice`, and the `productcatalog-postgres` database) and describes the actual dependency chain rather than offering generic advice. That map is your incident's blast-radius diagram, produced in one prompt: the frontend renders product listings by calling `productcatalogservice`, which reads from its PostgreSQL database.
+Read the answer. It names your services (`frontend`, `productcatalogservice`, and the `productcatalog-postgres` database) and describes the actual dependency chain rather than offering generic advice. That's your incident's blast-radius diagram, produced in one prompt: the frontend renders product listings by calling `productcatalogservice`, which reads from its PostgreSQL database.
 
 ### Step 3.2 - See where the memories come from
 
@@ -103,47 +123,63 @@ Curious where that knowledge lives? Open the Assistant's **three-dot menu → Se
 Memories are why the Assistant's answers are specific to your environment instead of textbook generic. They refresh automatically each week and respect data source permissions, so you only ever see memories for data you're allowed to query. When an answer feels generic, a stale or missing memory is often why, and a manual refresh from this page usually fixes it.
 :::
 
-You now know the shape of the system. Before digging into raw signals, get yourself to the right place in Grafana by asking for it.
+You now know the shape of the system. Next, find out whether the database underneath it is in trouble.
 
 ---
 
-## Part 4 - Point at exactly the right panel
+## Part 4 - Ask for insight, and point at what you mean
 
-Finding a dashboard by concept and having its panels explained are both Lab 1 skills. Here they're the setup rather than the lesson: do both in one prompt, then learn the precision trick Lab 1 didn't cover.
+### Step 4.1 - Ask about the thing, not the chart
 
-### Step 4.1 - Get to the postgres board
-
-In the same conversation:
+The alert named postgres connections, so ask about postgres connections. In the same conversation:
 
 ```text
-Find the dashboard that shows database or postgres health, then explain what its panels show and which one would tell me if the database is running out of connections.
+How healthy is the postgres database behind the productcatalogservice? Is it running out of connections, how close to its limit is it, and is that getting worse?
 ```
 
-The Assistant surfaces the dashboard and tells you which panel matters right now, almost certainly the one tracking active connections against the max. That's your first concrete lead about *where* to look.
+You get a read on the database itself: the current backend connection count, the ceiling it's heading for, and the direction of travel. No dashboard, no panel, and no query on your part.
 
-### Step 4.2 - Pull that panel into the conversation
+That's the habit worth taking home. A dashboard was always a means to a number and a judgement, and asking for the number and the judgement directly is faster than finding the board that holds them. Everything in Part 5 works this way too.
 
-Open the dashboard so the connections panel is on screen. Panels are attached with the **crosshair button** in the prompt bar. Click the crosshair, then click the panel. It lands in the prompt bar as a `Panel: ...` pill. Hold Cmd/Ctrl while clicking to attach several panels at once.
+### Step 4.2 - Point at what's already on your screen
 
-With the panel attached, ask:
+Insight-first works right up until the thing you care about is already in front of you, and then describing it is slower than pointing at it. That's what the context tools are for.
+
+Ask the Assistant to take you to the board so you have something on screen to point at:
 
 ```text
-What's the current value on this panel, what's the max, and is the trend climbing?
+Take me to the dashboard that shows postgres health for this database.
 ```
 
-The Assistant reads both the panel's query **and** its live data, and tells you the backend connection count is climbing toward the database's limit.
+With the connections panel visible, click the **crosshair button** in the prompt bar, then click the panel. It lands in the prompt bar as a `Panel: ...` pill. Hold Cmd/Ctrl while clicking to attach several panels at once. Now ask about *that* panel:
+
+```text
+Is what this panel is showing consistent with the errors customers are seeing, and what value here should have woken somebody up?
+```
+
+The Assistant reads both the panel's query and its live data, so it answers about the exact series in front of you rather than about postgres in general.
+
+You can hand over a whole dashboard the same way. Type `@` in the prompt bar, pick the dashboard by name, and ask:
+
+```text
+Does anything else on this dashboard support or contradict that, and what would you look at next?
+```
 
 :::tip
-Two precision tools, two jobs. The **crosshair** attaches what's on the page in front of you, those being a panel, a template variable, and an annotation. An **`@` mention** pulls in things you *aren't* looking at, such as a dashboard, a folder, a data source, a metric, a label, or a Skill. Reach for whichever fits whenever "this one, specifically" matters, because "how's the database?" and pointing at the exact panel on your screen produce very different answers.
+Two precision tools, two jobs. The **crosshair** attaches what's on the page in front of you: a panel, a template variable, or an annotation. An `@` mention pulls in things you *aren't* looking at, such as a dashboard, a folder, a data source, a metric, a label, or a Skill. Reach for whichever fits whenever "this one, specifically" matters, and let the Assistant pick the data the rest of the time.
 :::
 
-In a few prompts you've gone from a blank map to a specific suspicion, postgres connections, without leaving the chat. Now confirm it with data.
+In a few prompts you've gone from a blank map to a specific suspicion, postgres connections. Now work out why.
 
 ---
 
-## Part 5 - Triage: query and correlate
+## Part 5 - Triage: work the problem, not the signals
 
-This is Lab 1's metrics, logs, and traces loop, but with a system that's actually on fire. Two things change under pressure. The first is the shape of the questions. Ask something broad, find the worst offender, drill into examples, look for a pattern, then ask what changed. That sequence is the backbone of agent-assisted debugging. The second is that you stop writing queries yourself and let the Assistant author them, then get it to teach you what it wrote.
+This is Lab 1's loop, run at incident speed: ask something broad, find the worst offender, go deeper on it, check whether the story holds together, then ask what changed.
+
+The loop is worth naming, because this is what agent-assisted debugging looks like in practice. You keep the questions and the judgement. The Assistant takes the retrieval: which service, which data source, which query language, over which time range, and how to condense what comes back into something a human can act on. Each answer changes the next question you ask, which is why this is a conversation rather than a form.
+
+So notice what you never do in this part. You never say "check the logs", or "now look at traces". You have a question and you want the answer; working out which signals hold it is part of the job you handed over. That matters beyond the workshop, because a real on-call engineer at 3am doesn't want a telemetry type, they want to know what's broken and whether they caused it.
 
 Send each of these as a follow-up in the **same conversation** so the Assistant keeps the context.
 
@@ -151,120 +187,118 @@ Send each of these as a follow-up in the **same conversation** so the Assistant 
 Detach the panel from Step 4.2 first. Click the crosshair and click the panel again to toggle it off, or remove its pill from the prompt bar. A panel attached with the crosshair stays attached to *every* message until you remove it, and these next questions are about the whole namespace rather than one panel. An `@` mention behaves differently, because it lives in the message text and applies only to the message you typed it into.
 :::
 
-### Step 5.1 - Find the worst offender (metrics)
+### Step 5.1 - Find the worst offender
 
 ```text
-List the services in ecommerce-prod by error rate over the last hour, highest first.
+What are the services in the ecommerce-prod namespace? Which ones have the highest error rate in the last hour?
 ```
 
-**List** gives you a ranked table. The `frontend` is near the top with a few percent errors, which is the symptom customers feel, but look at `productcatalogservice`: its error rate is far higher, up around **10%** against a baseline of essentially zero. The frontend depends on it for product listings, so that's your first lead.
+The `frontend` is near the top with a few percent errors, which is the symptom customers feel. Look past it at `productcatalogservice`: its error rate is far higher, up around 10% against a baseline of essentially zero. The frontend depends on it for product listings, so that's your lead.
 
-### Step 5.2 - Zoom in, and learn the query while you're at it
+### Step 5.2 - Go deeper on the suspect, and keep the query it wrote
 
 ```text
-Show the error rate for the productcatalogservice over the last hour and highlight any spikes.
+Go deeper on the productcatalogservice. What's happened to its error rate over the last hour, and when did it change?
 ```
 
-**Show** gives you a chart. The error rate sits flat near zero and then jumps. It appears as a clean step change rather than a gradual ramp. Something *changed* at a specific moment.
+The error rate sits flat near zero and then jumps, as a clean step change rather than a gradual ramp. Something changed at a specific moment.
 
-Now turn this into a learning moment. Ask the Assistant to hand you the query it just ran and explain it:
+The query behind that answer is yours to keep, so ask for it:
 
 ```text
-What PromQL did you use for that? Explain it line by line, then make it a rate over 5 minutes grouped by pod.
+What query did you run for that? Explain it line by line, then show me the same thing broken down per pod.
 ```
 
-This is a real accessibility win. You no longer need to remember `rate()` versus `irate()` or the exact label matchers. Ask for what you want, get a validated query, then ask it to **explain** and **refine** what it wrote, and you pick up PromQL by example while triaging.
+This is a real accessibility win. You no longer need to remember `rate()` versus `irate()`, or the exact label matchers, or which of PromQL, LogQL, TraceQL, and SQL a given answer needed. Ask for what you want, get a validated query back, then have it explain and refine what it wrote, and you pick the language up by example while you triage.
 
-### Step 5.3 - Drill into the detail (logs)
+### Step 5.3 - Ask why it's failing
 
 ```text
-Which operation on the productcatalogservice is failing, and show me example error logs for it. Then summarize those logs: group by message and tell me the most common one.
+Why is it failing? What's the actual error, and is it the same error every time?
 ```
 
-You used **summarize** in Lab 1; this is where it earns its keep. The most common message, over and over:
+Back comes the same message, over and over:
 
 ```text
 level=error msg="pq: sorry, too many clients already"
 ```
 
-That's the PostgreSQL driver (`pq`) telling you the database is **out of connections**. It's the smoking gun, but don't stop at one clue.
+That's the PostgreSQL driver (`pq`) telling you the database is out of connections. Note what you didn't do: you never mentioned logs, never opened Loki, and never wrote LogQL. You asked why, and the Assistant went where the answer lived and condensed a noisy stream into the one line that mattered.
 
-### Step 5.4 - Follow the request path (traces)
-
-```text
-Show me a slow or failed trace involving the frontend and productcatalogservice in the last hour, and explain where the time and the error were.
-```
-
-The frontend calls `productcatalogservice`, and the failing span is the database call. All three signals now point at the same place, which is the moment triage stops being a search and becomes a case.
-
-### Step 5.5 - Line the three signals up
+### Step 5.4 - Follow it out to the customer
 
 ```text
-For the productcatalogservice over the last hour, show me the error-rate spikes, the count of "too many clients" log lines, and the failing database spans across the same time range. Do the three line up, and when did they start?
+Where does this break for a customer loading the storefront homepage, and what does one failing request look like end to end?
 ```
 
-In a handful of prompts you've gone from "the storefront is down" to a strong hypothesis, which is that the **productcatalogservice is exhausting its postgres connections, and all three signals turn bad at the same moment.** That's genuine progress, but what you've established is *what* is failing and *when* it started, not *why*. And one thread from the page is still hanging.
+The Assistant walks the path from the frontend into `productcatalogservice` and down to the database call that fails. Traces are the signal people find most intimidating, and you got the useful part of one without opening a trace view or learning a span filter.
 
-### Step 5.6 - Pull the thread from Part 2
+### Step 5.5 - Ask what else the stack knows
 
-Back in Part 2, a `FeatureFlagChange` alert was firing alongside the others, so something changed earlier. Three signals now agree on the shape of the failure, which makes this the moment to ask what moved. Pay attention to how the question is phrased:
+```text
+What other signals do we have for this service? If there are profiles, tell me what's happening inside the process as it degrades. Is anything growing that shouldn't be?
+```
+
+The storefront ships continuous profiles alongside its metrics, logs, and traces, so this is a real question with a real answer, and a revealing one for a failure like this: resources inside the process accumulate instead of being handed back. It's also the moment most people realise the Assistant isn't a metrics chatbot with a log search bolted on. You asked one question and it reached for a fourth signal you hadn't thought to name.
+
+### Step 5.6 - Check whether the story holds together
+
+```text
+Does all of that hold together as one explanation? When did it start, and what's your best account of what's happening?
+```
+
+In a handful of prompts you've gone from "the storefront is down" to a hypothesis with evidence behind it: `productcatalogservice` is exhausting its postgres connections, and everything the stack collects turns bad at the same moment. That's real progress, but what you've established is *what* is failing and *when*, not *why*. And one thread from the page is still hanging.
+
+### Step 5.7 - Ask what changed
+
+Back in Part 2, a `FeatureFlagChange` alert was firing alongside the others, so something changed earlier. Now that you know the shape of the failure, it's time to ask what moved. Pay attention to how the question is phrased:
 
 ```text
 A FeatureFlagChange alert is firing for productcatalogservice. Which flag is it, and has it always been set that way?
 ```
 
-It names the flags, `productCatalogReadFromPostgres` and `productCatalogStopClosingPostgresConnections`, both managed by flagd. Then it answers the second half from history: both sat off for the whole retained window and flipped on within minutes of each other a short time ago. You now have a **change with a timestamp**, landing just before your symptom onset.
+It names the flags, `productCatalogReadFromPostgres` and `productCatalogStopClosingPostgresConnections`, both managed by flagd. Then it answers the second half from history: both sat off for the whole retained window and flipped on within minutes of each other a short time ago. You now have a change with a timestamp, landing just before your symptom onset.
 
 :::tip
 "Has it always been set that way" is doing the work here. Ask what a flag *is* set to and you get a configuration lookup: the present value, no history, no hint that anything ever moved. Ask whether it has *always* been that way and the Assistant goes to the `flag_state` metric instead, where every transition is recorded with a timestamp. Same subject, different tense, completely different answer.
 
-The lesson generalizes well beyond feature flags: **current-state questions hide changes, historical questions expose them.** Most incidents are caused by something that changed, so the tense you ask in often decides whether you find the cause at all.
+The lesson generalizes well beyond feature flags: current-state questions hide changes, and historical questions expose them. Most incidents are caused by something that changed, so the tense you ask in often decides whether you find the cause at all.
 :::
 
-You now have all four pieces -- what is failing, when it started, how it propagates, and a change that precedes it. Proving they're causally connected rather than coincidental is the part you'd rather not do by hand while customers are hitting errors.
+You now have all the pieces: what is failing, when it started, how it reaches the customer, and a change that precedes it. Proving they're causally connected rather than coincidental is the part you'd rather not do by hand while customers are hitting errors.
 
 This is the moment to hand it to a Deep Investigation.
 
-:::note
-**If the Assistant offers to start an investigation instead of answering, that's expected.** Ask it *why* something is broken, rather than what or when, and it stops triaging and hands the problem to the investigation agent, complete with the symptom, scope, and time range it worked out. That's the product recognizing you've crossed from reading data into finding a cause. You don't need a card to continue, since Part 6 launches an investigation deliberately, but if you have one, leave it where it is and Part 6 will tell you how to use it.
-:::
-
 :::tip
-Notice how the **verb** shaped each response. *List* produced a ranking, *Show* produced a chart, *Summarize* condensed the logs, and asking whether signals *line up* produced a correlation. Being specific about the verb, the service, the signal, and the time range is the single biggest lever on answer quality.
+**Ask for the answer, not for the data.** Every prompt in this part asked about the system, and none of them named a data source, a query language, or a signal. That's not a trick of phrasing, it's the whole proposition: you'd need to know your stack collects metrics, logs, traces, and profiles to ask for them by name, and needing to know that is exactly the barrier the Assistant removes.
+
+Where precision does pay is in naming the service, the namespace, and the time range you care about, and in saying what you want to do with the answer. "How's the database?" and "is the postgres database behind productcatalogservice running out of connections in the last hour?" are both fine questions, and the second one is a much better answer.
 :::
 
 ---
 
 ## Part 6 - Root cause: launch a Deep Investigation
 
-Manual triage got you a lead. A **Deep Investigation** confirms it. Instead of one Assistant answering in a chat, it works the problem in the background across metrics, logs, traces, and recent changes, keeping a running set of numbered **hypotheses** that it promotes, demotes, or rules out as evidence accumulates. It also cites every source it consulted, so you can check its reasoning instead of trusting a verdict.
+Manual triage got you a lead. A **Deep Investigation** confirms it, and it's a different kind of thing from a chat answer.
 
-### Step 6.1 - Start the investigation
+Rather than one agent replying to one question, an investigation is agentic. An orchestrating agent plans the work, splits the problem into separate lines of enquiry, and delegates them to specialist agents that each interrogate one part of your estate and hand back a summarized result. The orchestrator holds the thread: it keeps a running set of numbered **hypotheses**, promotes, demotes, or rules each one out as evidence lands, and decides what to look at next. It works across all your telemetry and events, runs in the background for as long as the problem needs rather than as long as you're willing to wait for a reply, and cites every source it consulted so you can check its reasoning instead of trusting a verdict.
 
-Triage handed you a lead; now hand it to an investigation. Go to **AI → Investigations → New Investigation** and give it everything you worked out:
+### Step 6.1 - Hand your own conversation to an investigation
+
+You've just spent Part 5 building context: the symptom, the services, the failure path, the time range, and a flag that moved. Don't retype any of it. Ask the conversation you're already in to take the work further:
 
 ```text
-The storefront homepage is showing errors and products aren't displaying. The ProductCatalogServiceErrorRate, FrontendErrorRate, and PostgreSQLHighConnections alerts are all firing. Investigate the full request chain (frontend, productcatalogservice, productcatalog-postgres), including any recent deployments or feature-flag changes. Don't just check what the feature flags are set to now. Find when they last changed state, from the flag_state metric rather than the current flagd config. Report the most likely root cause with supporting evidence.
+Go and investigate this properly. Work out why the productcatalogservice is exhausting its postgres connections, and confirm or rule out the flag change as the trigger. I want evidence, not just a verdict.
 ```
 
-Notice how much of Part 5 is in there. A good investigation prompt states the **symptom**, the **firing alerts**, and the **suspected dependency chain**, and asks for **evidence** rather than a bare verdict. Every one of those came out of triage, which is the payoff for working the problem in the open instead of opening with "what's broken?"
+Asking *why* is what changes the behaviour. The Assistant stops triaging and offers to hand the problem to the investigation agent, in a proposal card carrying the symptom, the scope, and the time range it worked out from your conversation. Read what it's proposing, add anything it's missed in the card's follow-up box, then click **Start investigation**.
 
-The flag line is the part worth adding by hand, and Step 5.6 is why. You already established in chat that those flags flipped recently, but **the investigation agent doesn't see your conversation.** It works from the prompt alone, so the historical framing that got you a timestamp has to be handed over deliberately.
-
-A run of this lab without that line read the current flagd config and built its root-cause chain on the flag "shipping with `defaultVariant: on` since deploy." It concluded the service had leaked connections *by design* ever since its pod started, and dated the onset around ten hours earlier than the actual trigger. Every symptom it found was correct; the story it told about them was not. With the line, the same investigation reports the flags flipping from off to on at a specific minute, and uses the pod's age to *rule out* a deployment rather than to blame one. Same evidence, opposite conclusion, and only one of the two tells a team to revert something.
-
-That's the general lesson about handing work to an agent that starts cold. Anything you learned *by how you asked* has to travel with the request, because none of your chat does.
+That pattern is worth taking home, and it's more than a shortcut. Assembling a brief is grunt work, and grunt work is what you have an agent for. Summarizing your own findings by hand so that a second agent can catch up is a habit from a world where these tools couldn't talk to each other: ask the thing that already knows to start the thing that needs to know.
 
 :::note
-**If the Assistant offered you a proposal card during Part 5, you can start from that instead.** The card already carries the symptom, the scope, and the time range it worked out from your conversation, so the only thing missing is the historical-flag instruction. Type that one sentence into the card's follow-up box to refine the proposal, then click **Start investigation**.
+**If no card appears, ask more directly**, for example `Start a deep investigation into why the productcatalogservice is exhausting its postgres connections`. Two mechanics are worth knowing. The chat's mode selector doesn't offer Investigation once a conversation has messages in it, by design, so mid-conversation the product routes you through a proposal card instead of a mode switch. And starting from a card promotes that conversation to the investigation, which pins its mode and means you can't launch a second one from the same chat. To run Part 6 again with a different prompt, start a new chat.
 
-Whether a card shows up depends on how causal your wording was. Asking *why* something is broken triggers one; Part 5's what, when, and what-changed questions usually don't, so most people reach this step without one. Both routes end up in the same place.
-:::
-
-:::note
-**The chat's mode selector won't offer Investigation mid-conversation.** It's hidden by design in any chat that already has messages. Once you're several prompts in, the product routes you through a proposal card rather than a mode switch. If you want the mode selector, open a brand-new chat first.
-
-Starting from the card also promotes that conversation to the investigation, which pins its mode and means you can't launch a second investigation from it. To run Part 6 again with a different prompt, start a new chat.
+You can also launch cold from **AI → Investigations → New Investigation**, which is what you'd do when you've been handed an alert and haven't triaged anything yet. An investigation started that way sees only what you type into it, so state the symptom, the firing alerts, and the suspected dependency chain, and ask for evidence rather than a bare verdict.
 :::
 
 ### Step 6.2 - Watch the hypotheses form
@@ -299,15 +333,15 @@ Scroll the report to its **Incident timeline** section, where the investigation 
 
 Read the timeline against what you found by hand in Part 5. The timestamps are checkable, and comparing them is how you build a sense of when to trust this and when to dig.
 
-You'll also notice a **Rules** chip in the header, alongside any applied Skills, showing the guidance the investigation followed while working. Your environment ships with several already. By the end of this lab one of them will be yours, and future investigations of this kind will start smarter because of it.
+You'll also notice a **Rules** chip in the header, alongside any applied Skills, showing the guidance the investigation followed while working. Your environment ships with several already, and one of them is why the report dated the flag change correctly: it tells investigations to establish when a flag last changed state from its history rather than reading the current flag configuration, which reports a value with no history behind it. That's Step 5.7's tense lesson, written down once so nobody has to remember it under pressure. By the end of this lab one of those Rules will be yours.
 
 :::info
 **What "good" looks like:** the report should tie the frontend errors, the productcatalogservice failures and restarts, and the postgres connection exhaustion into one causal story, with the flag change as the trigger. The exact percentages vary a lot with how long the incident has been running: a freshly armed one sits in the single digits, while one left armed for hours drives productcatalogservice to 100% and the frontend near 30%. That's cross-signal correlation that would take an on-call engineer 20-30 minutes by hand. If it only surfaced one piece, treat it as a partial result and follow up.
 
-If the report calls the flag a long-standing default rather than a recent change, it read the flagd config instead of the `flag_state` metric. Put Step 5.6's question to it directly: *has productCatalogStopClosingPostgresConnections always been set that way?* And if it describes the flag as *flapping* rather than changing once, it read every series at once (each `flagapi` pod emits its own), so ask it to narrow to a single flag name.
+If the report calls the flag a long-standing default rather than a recent change, it read the current flag configuration instead of the flag's history, and dated the onset from the pod's age. Put Step 5.7's question to it directly: *has productCatalogStopClosingPostgresConnections always been set that way?* And if it describes the flag as *flapping* rather than changing once, it read every series at once (each `flagapi` pod emits its own), so ask it to narrow to a single flag name.
 :::
 
-You've gone from a page to a **confirmed, evidence-backed root cause** in minutes. Before you stop the bleeding, tell the humans.
+You've gone from a page to a confirmed, evidence-backed root cause in minutes. Before you stop the bleeding, tell the humans.
 
 ---
 
@@ -329,13 +363,13 @@ Same facts, different audience:
 Now write a two-sentence, non-technical status update for a VP: customer impact, what we've confirmed, and the ETA to mitigation.
 ```
 
-Notice how the Assistant adjusts register, dropping the `pq` internals for the exec version while keeping them for the engineering channel. Asking for **audience-specific summaries** is one of its most underrated everyday moves.
+Notice how the Assistant adjusts register, dropping the `pq` internals for the exec version while keeping them for the engineering channel. Asking for audience-specific summaries is one of its most underrated everyday moves.
 
 ### Step 7.3 - Share the whole investigation
 
-Sometimes the most useful thing to send is the artifact itself. Click the **share icon** in the conversation header, then **Generate share link**, and drop that link in the incident channel so responders can see the full evidence trail without you re-explaining it. What you're sharing is a **snapshot**: anything you ask after generating the link isn't added to it automatically.
+Sometimes the most useful thing to send is the artifact itself. Click the **share icon** in the conversation header, then **Generate share link**, and drop that link in the incident channel so responders can see the full evidence trail without you re-explaining it. What you're sharing is a snapshot: anything you ask after generating the link isn't added to it automatically.
 
-Beside the share icon is a **three-dot menu** (*More conversation options*) holding two things worth knowing about. **Download conversation** saves it as a file for a postmortem attachment. **Hand off conversation** is the one people mistake for sharing: it's aimed at a *coding agent* rather than a colleague, and it hands over a ready-made prompt, the conversation ID, and a read-only command that pulls the transcript so the agent starts with everything you learned. That's the "an agent starting cold sees none of your chat" problem from Step 6.1, packaged instead of retyped. Lab 3 puts that command line in your hands, which is where the option starts to earn its keep.
+Beside the share icon is a **three-dot menu** (*More conversation options*) holding two things worth knowing about. **Download conversation** saves it as a file for a postmortem attachment. **Hand off conversation** is the one people mistake for sharing: it's aimed at a *coding agent* rather than a colleague, and it hands over a ready-made prompt, the conversation ID, and a read-only command that pulls the transcript so the agent starts with everything you learned. It's the same idea as launching the investigation from your own conversation in Step 6.1: the context travels with the request instead of being retyped, just aimed at an agent outside Grafana. Lab 3 puts that command line in your hands, which is where the option starts to earn its keep.
 
 :::info
 **Sharing respects access.** The dialog spells it out: the link is *only accessible within your Grafana organization*. Someone outside your stack can't open it, so this doesn't leak telemetry. It's a read-only snapshot for colleagues who could already sign in, not a way around RBAC.
@@ -349,7 +383,7 @@ The team is informed. Now stop the bleeding.
 
 Up to now the Assistant has been *reading* your systems. With **MCP (Model Context Protocol)** it can also *act* on them, talking to Kubernetes, Gitea, and other tools through a standard interface. Your workshop stack runs a Kubernetes MCP server inside the cluster (you can even see it as the `kubernetes-mcp-server` service in your telemetry) and has a Gitea MCP connected to an `assistant-workshop` repo on your workshop Gitea.
 
-You have two follow-ups from the investigation: get the storefront working again **now** by restarting the leaking pods, and get the leak fixed **for good** by filing a ticket for engineering.
+You have two follow-ups from the investigation: get the storefront working again now by restarting the leaking pods, and get the leak fixed for good by filing a ticket for engineering.
 
 If the incident window has closed by the time you get here and the pods have settled, both steps still work unchanged. The restart count the leak left behind is your evidence either way, and what this part really teaches is the loop of read, approve, write, verify.
 
@@ -361,7 +395,7 @@ Start a new conversation and send:
 Use the Kubernetes MCP to list the productcatalogservice pods in ecommerce-prod, with the status, age, and restart count for each one.
 ```
 
-Look at the **restart count**. One pod is clearly the culprit, and it's young: 5 restarts in the run this lab was captured from, 14 in a later one. The separate `productcatalogservice-europe` pod sits at zero restarts and is unaffected, which makes the contrast stark. That's the crash-restart-crash sawtooth from the investigation, now visible directly in the cluster, and it makes the next step unambiguous.
+Look at the restart count. One pod is clearly the culprit, and it's young: 5 restarts in the run this lab was captured from, 14 in a later one. The separate `productcatalogservice-europe` pod sits at zero restarts and is unaffected, which makes the contrast stark. That's the crash-restart-crash sawtooth from the investigation, now visible directly in the cluster, and it makes the next step unambiguous.
 
 ### Step 8.2 - Remediate, with a human in the loop
 
@@ -379,7 +413,7 @@ Approve it. The deployment controller spins up a replacement. Verify it worked:
 List the productcatalogservice pods again and tell me which one is new.
 ```
 
-The new pod is seconds old with **0 restarts**, and the storefront should start recovering. What you just watched is the full agent loop: it **read** the cluster state, **reasoned** about which pod was worst, **wrote** the change once you approved it, then **verified** the result. That's the Assistant working as an agent rather than a chatbot.
+The new pod is seconds old with **0 restarts**, and the storefront should start recovering. What you just watched is the full agent loop: it read the cluster state, reasoned about which pod was worst, wrote the change once you approved it, then verified the result. That's the Assistant working as an agent rather than a chatbot.
 
 :::warning
 **That was a real action on a real cluster.** In production the guardrails are what matter. MCP actions surface a confirmation prompt by default, which is the human-in-the-loop step you just used. The service account is scoped to one namespace and a fixed set of verbs. And blast radius counts: deleting one pod is recoverable, scaling a deployment to zero is not. Match the permissions you grant to the risk you can tolerate.
@@ -396,11 +430,7 @@ Use the Gitea MCP to draft an issue in the assistant-workshop repo, titled "prod
 Read the draft, because the Assistant may over-word things or miss a fact, then tighten it in conversation. When you're happy, tell it to submit, and it returns the issue URL. The immediate outage is handled and the permanent fix is now tracked.
 
 :::assistant-tip
-The Assistant can also draft the **k6 load test** itself. Ask *"write a k6 script that ramps to ~100 concurrent users hitting the product listing endpoint, so this connection leak would fail CI"* and paste the result into the repo. Generating and explaining k6, PromQL, LogQL, TraceQL, and SQL are all part of its query-authoring toolkit.
-:::
-
-:::info
-Gitea is standing in for whatever tracks work at your organization. The pattern is identical for a code host, an issue tracker, or a project management tool such as Jira, Linear, ServiceNow, or GitHub, because MCP is a standard interface rather than a per-product integration. Connect the server, scope its tools and its credential, and the Assistant can file into the system your team already uses.
+The Assistant can also draft the k6 load test itself. Ask *"write a k6 script that ramps to ~100 concurrent users hitting the product listing endpoint, so this connection leak would fail CI"* and paste the result into the repo. Generating and explaining k6, PromQL, LogQL, TraceQL, and SQL are all part of its query-authoring toolkit.
 :::
 
 ### Step 8.4 - What it takes to add an MCP server
@@ -436,9 +466,15 @@ Now open the **Tools** tab. Grafana makes the next point for you, in a banner at
 
 ---
 
-## Part 9 - Build a safety net in Dashboarding mode
+## Part 9 - Build a safety net
 
-You mitigated the incident and filed the fix. Now make it **visible** so nobody gets surprised the same way again. Everything so far has been in default (chat) mode; for building dashboards there's a dedicated **Dashboarding mode** with a focused, iterative experience.
+You mitigated the incident and filed the fix. Now make sure nobody gets surprised the same way again. There are two ways to do that, and they answer different questions.
+
+A dashboard answers "what does this look like right now" for whoever thinks to open it. A **Watcher** answers "is anything wrong, and tell me if it is" without anyone opening anything at all. You'll build one of each, in that order, and the contrast is the point: one waits to be read, the other comes to you.
+
+### Step 9.1 - Build the dashboard in Dashboarding mode
+
+Everything so far has been in default (chat) mode. For building dashboards there's a dedicated **Dashboarding mode** with a focused, iterative experience.
 
 First get yourself onto a blank canvas: go to **Dashboards → New → New dashboard**. Dashboarding mode writes to whichever dashboard is currently open, so prompting while you're still on the service dashboard from Part 4 lands your panels there, usually as a new tab, rather than giving you a board of your own.
 
@@ -468,11 +504,39 @@ Dashboarding mode is for *creating and editing*: scaffolding new boards, refinin
 It also never creates a dashboard or navigates for you. It edits the one that's open, and opens a fresh one only when nothing is. That's why this part starts on a blank canvas, and it's Part 4's lesson from the other direction: what's on your screen *is* context, whether you attached it deliberately or not.
 :::
 
+### Step 9.2 - Set a Watcher so nobody has to watch it
+
+A dashboard still needs a human to look at it, and the alerts that did fire only covered the symptoms somebody had already thought to write a rule for. The failure mode you now understand, a connection pool leaking toward its ceiling, is the one nobody had written down. A **Watcher** is an always-on agent that checks a scoped part of your telemetry on a schedule. You describe what it should keep an eye on, the Assistant calibrates concrete checks and a baseline against your own data, and from then on it decides for itself whether the latest run is worth telling you about.
+
+Go to **AI → Watchers → New watcher** and fill in:
+
+| Field | Value |
+|:--|:--|
+| Name | `Productcatalogservice postgres connections` |
+| Give the watcher context | `Watch the productcatalogservice in ecommerce-prod for postgres connection exhaustion. Its database allows 100 connections. Connections climbing steadily toward that ceiling, "pq: sorry, too many clients already" errors, or the service restarting repeatedly all mean the connection pool is leaking and customers are seeing errors on the storefront homepage. Brief error spikes during a deployment are expected and fine.` |
+| Datasources | The Prometheus and Loki data sources for the storefront |
+| Repeats | 15 minutes, the shortest interval available |
+| Sensitivity | Balanced |
+
+Click **Calibrate** and watch what it does. It inspects your telemetry, dashboards, and alert rules, proposes the checks it intends to save, and asks you about anything ambiguous. Read the proposed checks before you accept them, because these are what every unattended run from here on will evaluate. When calibration finishes the watcher is **Ready**; click **Run now** to see one result immediately rather than waiting for the schedule, then **Start** to turn on scheduled runs.
+
+Open the run it produced. You get an assessment of **All clear**, **Flagged**, or **Escalated**, the reasoning behind it, and the current-versus-baseline evidence that informed it. That's the difference from the dashboard you just built: the judgement has already been made for you.
+
+:::assistant-tip
+Watchers can act on what they find, which is where this closes the loop on the whole lab. A watcher can notify Slack, post to a webhook, publish findings into Grafana Alerting so your existing notification policies and IRM escalation handle them, and launch a Deep Investigation on a critical finding. That last one means the next occurrence of this incident can be investigated before anybody has read a page.
+:::
+
+:::info
+**Dashboards aren't obsolete, but you need fewer of them.** Teams have historically built a dashboard for every question anyone might ask, because a chart was the only way to answer one. With the Assistant you can ask the question directly, and with a Watcher you don't have to ask at all. Keep the dashboards people genuinely read together, in an incident review or on a wall, and let insight and Watchers cover the rest.
+
+Watchers are a Grafana Cloud public preview feature and need the Watchers permissions on your account. If **Watchers** isn't in your Assistant navigation, read this step rather than working it, and take the pattern home instead.
+:::
+
 ---
 
 ## Part 10 - Prevent: turn the shift into reusable knowledge
 
-Here's the part most teams miss. You just did good work, but if the storefront breaks the same way next month, whoever's on call starts from scratch. The final move is to **capture this incident as reusable knowledge** so the Assistant runs the playbook automatically next time. This is where an incident stops being a fire drill and becomes a compounding asset.
+Here's the part most teams miss. You just did good work, but if the storefront breaks the same way next month, whoever's on call starts from scratch. The final move is to capture this incident as reusable knowledge so the Assistant runs the playbook automatically next time. This is where an incident stops being a fire drill and becomes a compounding asset.
 
 ### Step 10.1 - Set a standing Rule
 
@@ -525,7 +589,7 @@ This is the payoff. Start a **new conversation** and, without mentioning the Ski
 The homepage is showing errors and products aren't loading. Can you take a look?
 ```
 
-The Assistant recognizes the problem, **finds your Skill on its own**, and runs the whole investigation you built, without anyone having to remember a command. The next person on call gets your expertise for free.
+The Assistant recognizes the problem, finds your Skill on its own, and runs the whole investigation you built, without anyone having to remember a command. The next person on call gets your expertise for free.
 
 ### Step 10.4 - Automate the first responder
 
@@ -547,16 +611,17 @@ One last habit worth building: when a response is especially good or noticeably 
 
 ## What just happened
 
-You ran an entire incident with the Assistant as your partner at every stage, and along the way you touched the whole product:
+You ran an entire incident with the Assistant as your partner at every stage, and along the way you touched most of the product:
 
-1. **Quickstart and orientation**: started the shift from the Assistant's suggested prompts, saw where team-wide quickstarts would live, and let **Memories** map an unfamiliar system in seconds.
+1. **Orientation**: opened the shift from the Assistant's suggested prompts, saw where team-wide Quickstart prompts live, then asked one question from the firing alert and let Memories map an unfamiliar system in seconds.
 2. **Precision**: attached the exact panel with the crosshair and `@` mentioned the dashboard you meant, instead of describing them and hoping.
-3. **Querying and correlation**: had the Assistant author and explain PromQL, LogQL, and TraceQL, correlated metrics, logs, and traces into a hypothesis, then asked the historical question that surfaced the change behind it.
-4. **Deep Investigation**: proved the root cause across all signals and changes, read the report and timeline, and saw how Rules and Skills feed back into it.
-5. **Collaboration**: packaged the finding for an incident channel and a VP, and shared the investigation as a read-only link.
-6. **MCP**: let the Assistant *act*, restarting the failing pods and filing the fix with you approving every write, then read a server's configuration to see how its credential and tool list bound what it can do.
-7. **Dashboarding mode**: built a monitoring board so the next occurrence is caught early.
-8. **Rules, Skills, and automation**: captured the whole playbook, wired up IRM automation, and closed the feedback loop.
+3. **Triage**: asked for insight rather than for a telemetry type, and got answers drawn from metrics, logs, traces, and profiles without naming one, then had the Assistant explain the queries it wrote along the way.
+4. **What changed**: asked the historical question that surfaced the flag behind the failure, rather than the current-state one that hides it.
+5. **Deep Investigation**: launched it from the conversation that found the lead, followed the hypotheses to a root cause, audited the sources, and walked the timeline.
+6. **Collaboration**: packaged the finding for an incident channel and a VP, and shared the investigation as a read-only link.
+7. **MCP**: let the Assistant *act*, restarting the failing pods and filing the fix with you approving every write, then read a server's configuration to see how its credential and tool list bound what it can do.
+8. **A safety net**: built a dashboard for the humans and a Watcher that checks without them.
+9. **Rules, Skills, and automation**: captured the whole playbook, wired up IRM automation, and closed the feedback loop.
 
 Orient, navigate, triage, root-cause, communicate, remediate, prevent: that arc is the full incident lifecycle, and you worked it conversationally, with a human in the loop on every action that mattered. The value of the Assistant isn't answering one question. It's working the whole problem alongside you and leaving the team better equipped than it found them.
 

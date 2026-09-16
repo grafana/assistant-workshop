@@ -15,7 +15,7 @@ The **workshop facilitator will provide** you with the following:
 
 - A personal logon (username and password)
 - A URL to a pre-provisioned Grafana Cloud stack - e.g. `https://nnnnnn.grafana.net`
-- Access to the AppEnv e-commerce storefront running on that stack
+- Access to the e-commerce storefront running on that stack
 - A URL to your own browser IDE, used for the command-line part of Lab 3
 
 Your user needs the following roles on the stack. Lab 1 needs only the first; the rest are arranged for you before the workshop starts:
@@ -36,9 +36,10 @@ Your logon has been sent to the email address you provided when you signed up. I
 
 This workshop builds from everyday fundamentals to a full incident investigation, then out to the rest of your team's workflow:
 
-- **Lab 1 - Understanding Assistant:** the everyday workflows - asking questions in natural language, navigating Grafana by asking, finding dashboards by concept, and reading and correlating telemetry across metrics, logs, and traces.
+- **Lab 1 - Understanding Assistant:** the everyday workflows - asking questions in natural language, navigating Grafana by asking, finding dashboards by concept, and getting one broad question about a system's health answered across metrics, logs, traces, and profiles.
 - **Lab 2 - Assistant During an Incident:** follow a single storefront outage from alert to resolution, using the Assistant's power features together. These features include infrastructure Memories, structured prompting, a Deep Investigation, MCP-driven remediation, and reusable Rules and Skills.
 - **Lab 3 - Assistant Where Your Team Works:** take those capabilities out of the Assistant panel - into an application's own interface with the SDK, onto the command line the way a pipeline would drive it, and into scheduled Automations that run unattended - then work out where the blast radius sits in each of those surfaces.
+- **Lab 5 - Performance Testing With Assistant:** turn the whole thing around and test before something breaks. Build a k6 load test from the endpoints and traffic levels found in your own traces and metrics, review what the Assistant wrote, run it, and read the results back in the same conversation.
 
 Every step is hands-on. The one capability we can't hand you is Slack, which needs a workspace connected to the stack by an admin; it's covered as a read-along in Lab 3 with the setup written out so you can follow it at home.
 
